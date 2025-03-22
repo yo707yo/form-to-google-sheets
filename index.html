@@ -321,6 +321,11 @@
         </div>
         
         <div class="form-group">
+          <label for="additionalNotes">Additional Suggestions and Notes</label>
+          <textarea id="additionalNotes" name="Additional Suggestions and Notes" placeholder="Enter any additional suggestions or notes..."></textarea>
+        </div>
+        
+        <div class="form-group">
           <label for="status">Status</label>
           <select id="status" name="Status" required onchange="updateStatusStyle()">
             <option value="" disabled selected>Select status</option>
@@ -348,11 +353,6 @@
           </div>
         </div>
         
-        <div class="form-group">
-          <label for="count"># of Hours</label>
-          <input id="count" name="# of Hours" type="number" min="0" placeholder="Enter number" required>
-        </div>
-        
         <button type="submit">Submit Report</button>
       </form>
 
@@ -378,7 +378,7 @@
 
   <script>
     // Your Google Apps Script Web App URL from the deployment
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbyh0DqI8kLtD6EQt-6RtslfwVTd_XHDYA4PVhZ1KadNFlaQB5W7BhtvQ5-y30CdL7VG_Q/exec'
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbxYPUdPMea9NQuQG4ql_udXoh-qg8VIzOOaJlL-KqQVdDMFRIwCvEhjTNqLS8h4hSvFfQ/exec'
     
     const form = document.forms['submit-to-google-sheet']
     const loading = document.querySelector('.js-loading')

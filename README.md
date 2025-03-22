@@ -11,7 +11,7 @@ A customized HTML form that submits daily reports directly to a Google Sheets sp
 - Status dropdown with color-coded options
 - Time Spent text entry field
 - Start and End Date fields with popup calendars
-- Number of occurrences field
+- Number of hours field
 - Loading indicator during submission
 - Success and error messages
 - Responsive design that works on all devices, including mobile phones
@@ -154,7 +154,7 @@ function doPost (e) {
 Make sure your Google Sheet has the following column headers (in any order):
 
 - Timestamp
-- Which region page is this for?
+- Your local Co-op?
 - Select Name
 - Subject
 - Tasks/Actions Completed
@@ -162,7 +162,7 @@ Make sure your Google Sheet has the following column headers (in any order):
 - Time Spent
 - Start Date
 - End Date
-- \# of Occurrences
+- \# of Hours
 
 ## Using the Form
 
@@ -174,7 +174,7 @@ Make sure your Google Sheet has the following column headers (in any order):
 6. Select a status (notice how "In Progress" appears in green and italic)
 7. Enter the time spent
 8. Select start and end dates using the calendar pickers
-9. Enter the number of occurrences
+9. Enter the number of hours
 10. Click "Submit Report"
 11. You should see a success message if the submission was successful
 12. Check your Google Spreadsheet to verify the data was added
