@@ -1,28 +1,87 @@
-# Submit a Form to Google Sheets | [Demo](https://form-to-google-sheets.surge.sh)
+# Leaders Daily Reporting Form
 
-#### How to create an HTML form that stores the submitted form data in Google Sheets using plain 'ol JavaScript (ES6), [Google Apps Script](https://developers.google.com/apps-script/), [Fetch](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) and [FormData](https://developer.mozilla.org/en-US/docs/Web/API/FormData).
+A customized HTML form that submits daily reports directly to a Google Sheets spreadsheet. This form is specifically designed to work with the [Leaders Daily Reporting spreadsheet](https://docs.google.com/spreadsheets/d/e/2PACX-1vRjk7xhJz5C4ThbwxokScyO9QTxbPrYDuXx7WA10PAn5qcFMQQeG-VergRjNFMBXNjqxp4OTG_Wki8b/pubhtml).
 
-## 1. Create a new Google Sheet
+## Form Features
 
-- First, go to [Google Sheets](https://docs.google.com/spreadsheets) and `Start a new spreadsheet` with the `Blank` template.
-- Rename it `Email Subscribers`. Or whatever, it doesn't matter.
-- Put the following headers into the first row:
+- Region selection dropdown with options for all regions
+- Dynamic name dropdown that updates based on the selected region
+- Subject dropdown with predefined options
+- Tasks/Actions Completed textarea
+- Status dropdown with color-coded options
+- Time Spent text entry field
+- Start and End Date fields with popup calendars
+- Number of occurrences field
+- Loading indicator during submission
+- Success and error messages
+- Responsive design that works on all devices, including mobile phones
 
-|   |     A     |   B   | C | ... |
-|---|:---------:|:-----:|:-:|:---:|
-| 1 | timestamp | email |   |     |
+## Region-Specific Names
 
-> To learn how to add additional input fields, [checkout section 7 below](#7-adding-additional-form-data).
+The form includes a dynamic dropdown for names that changes based on the selected region:
 
-## 2. Create a Google Apps Script
+- **Founders**: Danny, Ivan
+- **App**: Danny
+- **LA/OC**: Kevin N, Bernadette L, Drew W
+- **Bay Area**: Malek, Patrick, Chase
+- **SDDU**: Luis A, Lee S, Livrado R
+- **Sacramento**: (No specific names, shows N/A option)
+- **Fresno**: Eustace, Asad, Jose
+- **Redding**: Kevin S, Frank H, Kat P
+- **Palm Springs**: Kerwin Q, Greg K, Judy P
 
-- Click on `Tools > Script Editor…` which should open a new tab.
-- Rename it `Submit Form to Google Sheets`. _Make sure to wait for it to actually save and update the title before editing the script._
-- Now, delete the `function myFunction() {}` block within the `Code.gs` tab.
-- Paste the following script in it's place and `File > Save`:
+## Subject Options
 
-```js
-var sheetName = 'Sheet1'
+The form includes a dropdown for subjects with the following options:
+
+- General
+- Calls
+- Emails
+- SMS
+- Document Approval
+- Order Supplies
+- App Ideas
+- To Do
+- General Suggestions
+- GoHighLevel Maintenance
+
+## Status Options
+
+The form includes a dropdown for status with the following options:
+
+- Not Started
+- In Progress (displayed in green and italic)
+- Skipped
+- Done
+
+## Date Fields
+
+The form includes two date fields with popup calendars:
+
+- Start Date: Defaults to today's date as the minimum selectable date
+- End Date: Automatically sets its minimum date to match the selected Start Date
+
+## Mobile Optimization
+
+The form is fully optimized for mobile devices:
+
+- Responsive layout that adapts to screen size
+- Properly sized input fields for touch interaction
+- Date fields that work with mobile calendar pickers
+- Optimized spacing and typography for small screens
+
+## Setup Instructions
+
+Follow these steps to connect the form to your Google Spreadsheet:
+
+### 1. Set up Google Apps Script
+
+1. Open your [Leaders Daily Reporting spreadsheet](https://docs.google.com/spreadsheets/d/e/2PACX-1vRjk7xhJz5C4ThbwxokScyO9QTxbPrYDuXx7WA10PAn5qcFMQQeG-VergRjNFMBXNjqxp4OTG_Wki8b/pubhtml) in Google Sheets (not the published HTML view)
+2. Click on `Extensions > Apps Script` which will open a new tab
+3. Delete any code in the editor and paste the following:
+
+```javascript
+var sheetName = 'Sheet1' // Change this if your data is on a different sheet
 var scriptProp = PropertiesService.getScriptProperties()
 
 function intialSetup () {
@@ -42,7 +101,7 @@ function doPost (e) {
     var nextRow = sheet.getLastRow() + 1
 
     var newRow = headers.map(function(header) {
-      return header === 'timestamp' ? new Date() : e.parameter[header]
+      return header === 'Timestamp' ? new Date() : e.parameter[header]
     })
 
     sheet.getRange(nextRow, 1, 1, newRow.length).setValues([newRow])
@@ -64,119 +123,73 @@ function doPost (e) {
 }
 ```
 
-> If you want to better understand what this script is doing, checkout the [`form-script-commented.js`](https://github.com/jamiewilson/form-to-google-sheets/blob/master/form-script-commented.js) file in the repo for a detailed explanation. 
+4. Click `File > Save` and give your script a name (e.g., "Leaders Daily Reporting Form")
 
-## 3. Run the setup function
+### 2. Run the setup function
 
-- Next, go to `Run > Run Function > initialSetup` to run this function.
-- In the `Authorization Required` dialog, click on `Review Permissions`.
-- Sign in or pick the Google account associated with this projects.
-- You should see a dialog that says `Hi {Your Name}`, `Submit Form to Google Sheets wants to`...
-- Click `Allow`
+1. In the Apps Script editor, select the `intialSetup` function from the dropdown menu next to the "Run" button
+2. Click the "Run" button
+3. When prompted, click "Review Permissions" and then "Allow" to grant the necessary permissions
 
-## 4. Add a new project trigger 
-- Click on `Edit > Current project’s triggers`. 
-- In the dialog click `No triggers set up. Click here to add one now.` 
-- In the dropdowns select `doPost`
-- Set the events fields to `From spreadsheet` and `On form submit`
-- Then click `Save`
+### 3. Deploy as web app
 
-## 5. Publish the project as a web app
+1. Click on `Deploy > New deployment`
+2. Click the gear icon next to "Select type" and choose "Web app"
+3. Fill in the following:
+   - Description: "Leaders Daily Reporting Form"
+   - Execute as: "Me"
+   - Who has access: "Anyone"
+4. Click "Deploy"
+5. Copy the Web app URL that appears in the deployment confirmation
 
-- Click on `Publish > Deploy as web app…`.
-- Set `Project Version` to `New` and put `initial version` in the input field below.
-- Leave `Execute the app as:` set to `Me(your@address.com)`.
-- For `Who has access to the app:` select `Anyone, even anonymous`.
-- Click `Deploy`.
-- In the popup, copy the `Current web app URL` from the dialog.
-- And click `OK`.
+### 4. Update the form with your script URL
 
-> **IMPORTANT!** If you have a custom domain with Gmail, you _might_ need to click `OK`, refresh the page, and then go to `Publish > Deploy as web app…` again to get the proper web app URL. It should look something like `https://script.google.com/a/yourdomain.com/macros/s/XXXX…`.
+1. Open the `index.html` file in a text editor
+2. Find the line that says `const scriptURL = '<SCRIPT URL>'` (around line 290)
+3. Replace `<SCRIPT URL>` with the Web app URL you copied in the previous step
+4. Save the file
 
-## 6. Input your web app URL
+### 5. Update your Google Sheet headers
 
-Open the file named `index.html`. On line 12 replace `<SCRIPT URL>` with your script url:
+Make sure your Google Sheet has the following column headers (in any order):
 
-```js
-<form name="submit-to-google-sheet">
-  <input name="email" type="email" placeholder="Email" required>
-  <button type="submit">Send</button>
-</form>
+- Timestamp
+- Which region page is this for?
+- Select Name
+- Subject
+- Tasks/Actions Completed
+- Status
+- Time Spent
+- Start Date
+- End Date
+- \# of Occurrences
 
-<script>
-  const scriptURL = '<SCRIPT URL>'
-  const form = document.forms['submit-to-google-sheet']
+## Using the Form
 
-  form.addEventListener('submit', e => {
-    e.preventDefault()
-    fetch(scriptURL, { method: 'POST', body: new FormData(form)})
-      .then(response => console.log('Success!', response))
-      .catch(error => console.error('Error!', error.message))
-  })
-</script>
-```
+1. Open the `index.html` file in a web browser
+2. Select a region from the dropdown
+3. Select a name from the dynamically populated dropdown
+4. Select a subject from the dropdown
+5. Fill in the tasks/actions completed
+6. Select a status (notice how "In Progress" appears in green and italic)
+7. Enter the time spent
+8. Select start and end dates using the calendar pickers
+9. Enter the number of occurrences
+10. Click "Submit Report"
+11. You should see a success message if the submission was successful
+12. Check your Google Spreadsheet to verify the data was added
 
-As you can see, this script uses the the [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API), a fairly new promise-based mechanism for making web requests. It makes a "POST" request to your script URL and uses [FormData](https://developer.mozilla.org/en-US/docs/Web/API/FormData) to pass in our data as URL paramters.
+## Troubleshooting
 
-Because Fetch and FormData aren't fully supported, you'll likely want to include their respective polyfills. [See section #8](#8-related-polyfills). 
+- If you see an error message when submitting the form, check that your script URL is correct
+- Make sure the column headers in your spreadsheet exactly match the `name` attributes in the form
+- If you're still having issues, check the browser console for more detailed error messages
 
-> **Fun fact!** The `<html>`, `<head>`, and `body` tags are actually among a handful of optional tags, but since the [rules around how the browser parses a page are kinda complicated](https://www.w3.org/TR/2011/WD-html5-20110525/syntax.html#optional-tags), you'd probably not want to omit them on real websites.
+## Customizing the Form
 
-## 7. Adding additional form data
-To capture additional data, you'll just need to create new columns with titles matching exactly the `name` values from your form inputs. For example, if you want to add first and last name inputs, you'd give them `name` values like so:
+You can customize the form by editing the `index.html` file:
 
-```html
-<form name="submit-to-google-sheet">
-  <input name="email" type="email" placeholder="Email" required>
-  <input name="firstName" type="text" placeholder="First Name">
-  <input name="lastName" type="text" placeholder="Last Name">
-  <button type="submit">Send</button>
-</form>
-```
-
-Then create new headers with the exact, case-sensitive `name` values:
-
-|   |     A     |   B   |     C     |     D    | ... |
-|---|:---------:|:-----:|:---------:|:--------:|:---:|
-| 1 | timestamp | email | firstName | lastName |     |
-
-## 8. Related Polyfills
-Some of this stuff is not yet fully supported by browsers or doesn't work on older ones. Here are some polyfill options to use for better support.
-
-- [Promise Polyfill](https://github.com/taylorhakes/promise-polyfill)
-- [Fetch Polyfill](https://github.com/github/fetch)
-- [FormData Polyfill](https://github.com/jimmywarting/FormData)
-
-Since the FormData polyfill is published as a Node package and needs to be compiled for browsers to work with, a good option for including these is using [Browserify's CDN called wzrd.in](https://wzrd.in/). This service compiles, minifies and serves the latest version of these scripts for us.
-
-You'll want to make sure these load before the main script handling the form submission. e.g.:
-
-```html
-<script src="https://wzrd.in/standalone/formdata-polyfill"></script>
-<script src="https://wzrd.in/standalone/promise-polyfill@latest"></script>
-<script src="https://wzrd.in/standalone/whatwg-fetch@latest"></script>
-
-<script>
-  const scriptURL = '<SCRIPT URL>'
-  const form = document.forms['submit-to-google-sheet']
-  ...
-</script>
-```
-
-# Have feedback/requests/issues?
-Please [create a new issue](https://github.com/jamiewilson/form-to-google-sheet/issues). PRs are definitely welcome, but please run your ideas by me before putting in a lot of work. Thanks!
-
-#### Related/Inspirational Articles
-- [Google Spreadsheets as a Database – INSERT with Apps Script form POST/GET submit method](https://mashe.hawksey.info/2011/10/google-spreadsheets-as-a-database-insert-with-apps-script-form-postget-submit-method/)
-- [Step by step setup to send form data to Google Sheets](http://railsrescue.com/blog/2015-05-28-step-by-step-setup-to-send-form-data-to-google-sheets/)
-- [Google Sheet Form Post](https://gist.github.com/willpatera/ee41ae374d3c9839c2d6)
-- [How to Submit an HTML Form to Google Sheets…without Google Forms](https://medium.com/@dmccoy/how-to-submit-an-html-form-to-google-sheets-without-google-forms-b833952cc175)
-- [Send Email from a Static HTML Form using Google Apps Mail!](https://github.com/dwyl/html-form-send-email-via-google-script-without-server)
-
-#### Documentation
-- [Google Apps Script](https://developers.google.com/apps-script/)
-- [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API)
-- [FormData](https://developer.mozilla.org/en-US/docs/Web/API/FormData)
-- [HTML `<form>` element](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/form)
-- [Document.forms](https://developer.mozilla.org/en-US/docs/Web/API/Document/forms)
-- [Sending forms through JavaScript](https://developer.mozilla.org/en-US/docs/Learn/HTML/Forms/Sending_forms_through_JavaScript)
+- Change the form title and description
+- Modify the region options or name lists in the JavaScript section
+- Update the styling by editing the CSS variables at the top of the file
+- Add or remove form fields as needed

@@ -1,16 +1,503 @@
-<form name="submit-to-google-sheet">
-  <input name="email" type="email" placeholder="Email" required>
-  <button type="submit">Send</button>
-</form>
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<script>
-  const scriptURL = '<SCRIPT URL>'
-  const form = document.forms['submit-to-google-sheet']
+  <title>Leaders Daily Reporting Form</title>
+  <meta name="description" content="Submit daily reports to Google Sheets">
+  
+  <style>
+    :root {
+      --primary-color: #4285F4;
+      --secondary-color: #34A853;
+      --background-color: #f9f9f9;
+      --text-color: #333333;
+      --error-color: #EA4335;
+      --success-color: #34A853;
+      --form-header-bg: #5c3d86;
+      --form-header-text: #ffffff;
+      --in-progress-color: #34A853;
+    }
 
-  form.addEventListener('submit', e => {
-    e.preventDefault()
-    fetch(scriptURL, { method: 'POST', body: new FormData(form)})
-      .then(response => console.log('Success!', response))
-      .catch(error => console.error('Error!', error.message))
-  })
-</script>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: var(--background-color);
+      color: var(--text-color);
+      padding: 40px 20px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.5;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+      color: var(--primary-color);
+    }
+
+    .form-container {
+      position: relative;
+      background: #fff;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+      margin-bottom: 30px;
+    }
+
+    .form-header {
+      background-color: var(--form-header-bg);
+      color: var(--form-header-text);
+      padding: 15px;
+      margin: -30px -30px 20px -30px;
+      border-radius: 8px 8px 0 0;
+      text-align: center;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 500;
+    }
+
+    input, textarea, select {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 16px;
+      transition: border-color 0.3s;
+    }
+
+    input:focus, textarea:focus, select:focus {
+      outline: none;
+      border-color: var(--primary-color);
+    }
+
+    textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+
+    button {
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      font-size: 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      width: 100%;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #3367D6;
+    }
+
+    .is-hidden {
+      display: none !important;
+    }
+
+    .loading {
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 8px;
+    }
+
+    .loading-spinner {
+      width: 50px;
+      height: 50px;
+    }
+
+    .loading-spinner svg {
+      position: relative;
+      animation: rotate 2s linear infinite;
+      height: 50px;
+      width: 50px;
+    }
+
+    .loading-spinner circle {
+      stroke: var(--primary-color);
+      stroke-dasharray: 1,200;
+      stroke-dashoffset: 0;
+      stroke-linecap: round;
+      animation: dash 1.5s ease-in-out infinite;
+    }
+
+    .message {
+      padding: 15px;
+      border-radius: 4px;
+      margin-top: 20px;
+      text-align: center;
+      font-weight: 500;
+    }
+
+    .success-message {
+      background-color: rgba(52, 168, 83, 0.1);
+      color: var(--success-color);
+    }
+
+    .error-message {
+      background-color: rgba(234, 67, 53, 0.1);
+      color: var(--error-color);
+    }
+
+    /* Style for "In Progress" option */
+    select#status option[value="In Progress"] {
+      color: var(--in-progress-color);
+      font-style: italic;
+    }
+
+    /* Custom styling to show the selected "In Progress" value in green and italic */
+    select#status.in-progress {
+      color: var(--in-progress-color);
+      font-style: italic;
+    }
+
+    /* Date input styling */
+    input[type="date"] {
+      appearance: none;
+      padding-right: 30px; /* Space for calendar icon */
+    }
+
+    /* Responsive styles for better mobile experience */
+    @media (max-width: 480px) {
+      body {
+        padding: 20px 10px;
+      }
+      
+      .form-container {
+        padding: 20px;
+      }
+      
+      .form-header {
+        margin: -20px -20px 15px -20px;
+        padding: 12px;
+      }
+      
+      .form-group {
+        margin-bottom: 15px;
+      }
+      
+      input, textarea, select {
+        padding: 10px;
+        font-size: 16px; /* Prevents zoom on focus in iOS */
+      }
+      
+      h1 {
+        font-size: 24px;
+      }
+      
+      .form-header h2 {
+        font-size: 20px;
+      }
+    }
+
+    @keyframes rotate {
+      100% { transform: rotate(360deg); }
+    }
+
+    @keyframes dash {
+      0% { stroke-dasharray: 1,200; stroke-dashoffset: 0; }
+      50% { stroke-dasharray: 89,200; stroke-dashoffset: -35; }
+      100% { stroke-dasharray: 89,200; stroke-dashoffset: -124; }
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 20px;
+      color: #666;
+      font-size: 14px;
+    }
+
+    .footer a {
+      color: var(--primary-color);
+      text-decoration: none;
+    }
+
+    .footer a:hover {
+      text-decoration: underline;
+    }
+
+    /* Date range container for better mobile layout */
+    .date-range-container {
+      display: flex;
+      gap: 15px;
+    }
+
+    .date-range-container .form-group {
+      flex: 1;
+    }
+
+    @media (max-width: 480px) {
+      .date-range-container {
+        flex-direction: column;
+        gap: 10px;
+      }
+    }
+  </style>
+
+  <!-- Polyfills for better browser compatibility -->
+  <script src="https://unpkg.com/formdata-polyfill@latest/formdata.min.js"></script>
+  <script src="https://unpkg.com/promise-polyfill@latest/dist/polyfill.min.js"></script>
+  <script src="https://unpkg.com/whatwg-fetch@latest/dist/fetch.umd.js"></script>
+</head>
+<body>
+  <div class="container">
+    <h1>Leaders Daily Reporting</h1>
+    
+    <div class="form-container">
+      <div class="form-header">
+        <h2>Daily Report Submission</h2>
+      </div>
+      
+      <form name="submit-to-google-sheet">
+        <div class="form-group">
+          <label for="region">Your local Co-op?</label>
+          <select id="region" name="Your local Co-op?" required onchange="updateNameOptions()">
+            <option value="" disabled selected>Select a region</option>
+            <option value="Founders">Founders</option>
+            <option value="App">App</option>
+            <option value="LA/OC">LA/OC</option>
+            <option value="Bay Area">Bay Area</option>
+            <option value="SDDU">SDDU</option>
+            <option value="Sacramento">Sacramento</option>
+            <option value="Fresno">Fresno</option>
+            <option value="Redding">Redding</option>
+            <option value="Palm Springs">Palm Springs</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label for="name">Select Name</label>
+          <select id="name" name="Select Name" required>
+            <option value="" disabled selected>Select a name</option>
+            <!-- Names will be populated based on selected region -->
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label for="subject">Subject</label>
+          <select id="subject" name="Subject" required>
+            <option value="" disabled selected>Select a subject</option>
+            <option value="General">General</option>
+            <option value="Calls">Calls</option>
+            <option value="Emails">Emails</option>
+            <option value="SMS">SMS</option>
+            <option value="Document Approval">Document Approval</option>
+            <option value="Order Supplies">Order Supplies</option>
+            <option value="App Ideas">App Ideas</option>
+            <option value="To Do">To Do</option>
+            <option value="General Suggestions">General Suggestions</option>
+            <option value="GoHighLevel Maintenance">GoHighLevel Maintenance</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label for="tasks">Tasks/Actions Completed</label>
+          <textarea id="tasks" name="Tasks/Actions Completed" placeholder="Describe tasks or actions completed..." required></textarea>
+        </div>
+        
+        <div class="form-group">
+          <label for="status">Status</label>
+          <select id="status" name="Status" required onchange="updateStatusStyle()">
+            <option value="" disabled selected>Select status</option>
+            <option value="Not Started">Not Started</option>
+            <option value="In Progress">In Progress</option>
+            <option value="Skipped">Skipped</option>
+            <option value="Done">Done</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label for="timeSpent">Time Spent</label>
+          <input id="timeSpent" name="Time Spent" type="text" placeholder="e.g., 2 hours" required>
+        </div>
+        
+        <div class="date-range-container">
+          <div class="form-group">
+            <label for="startDate">Start Date</label>
+            <input id="startDate" name="Start Date" type="date" required>
+          </div>
+          
+          <div class="form-group">
+            <label for="endDate">End Date</label>
+            <input id="endDate" name="End Date" type="date" required>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="count"># of Hours</label>
+          <input id="count" name="# of Hours" type="number" min="0" placeholder="Enter number" required>
+        </div>
+        
+        <button type="submit">Submit Report</button>
+      </form>
+
+      <div class="loading js-loading is-hidden">
+        <div class="loading-spinner">
+          <svg><circle cx="25" cy="25" r="20" fill="none" stroke-width="2" stroke-miterlimit="10"/></svg>
+        </div>
+      </div>
+
+      <div class="message success-message js-success-message is-hidden">
+        Thank you! Your report has been submitted successfully.
+      </div>
+      
+      <div class="message error-message js-error-message is-hidden">
+        Oops! There was a problem submitting your report. Please try again.
+      </div>
+    </div>
+    
+    <div class="footer">
+      <p>Follow the <a href="https://github.com/jamiewilson/form-to-google-sheets" target="_blank">Form to Google Sheets</a> guide to connect this form to your Google Sheet.</p>
+    </div>
+  </div>
+
+  <script>
+    // Your Google Apps Script Web App URL from the deployment
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbwSoRH4QlFP-YAlKy6FcFfqXxaiNWTxvcwVwl9SaZZz6Dogx6JnrJue__Z6aX6gAZ0I7A/exec'
+    
+    const form = document.forms['submit-to-google-sheet']
+    const loading = document.querySelector('.js-loading')
+    const successMessage = document.querySelector('.js-success-message')
+    const errorMessage = document.querySelector('.js-error-message')
+    
+    // Define names for each region
+    const regionNames = {
+      'Founders': ['Danny', 'Ivan'],
+      'App': ['Danny'],
+      'LA/OC': ['Kevin N', 'Bernadette L', 'Drew W'],
+      'Bay Area': ['Malek', 'Patrick', 'Chase'],
+      'SDDU': ['Luis A', 'Lee S', 'Livrado R'],
+      'Sacramento': [], // No names but still needs dropdown
+      'Fresno': ['Eustace', 'Asad', 'Jose'],
+      'Redding': ['Kevin S', 'Frank H', 'Kat P'],
+      'Palm Springs': ['Kerwin Q', 'Greg K', 'Judy P']
+    }
+    
+    // Function to update name options based on selected region
+    function updateNameOptions() {
+      const regionSelect = document.getElementById('region')
+      const nameSelect = document.getElementById('name')
+      const selectedRegion = regionSelect.value
+      
+      // Clear existing options
+      nameSelect.innerHTML = '<option value="" disabled selected>Select a name</option>'
+      
+      // Add names for the selected region
+      if (selectedRegion && regionNames[selectedRegion]) {
+        regionNames[selectedRegion].forEach(name => {
+          const option = document.createElement('option')
+          option.value = name
+          option.textContent = name
+          nameSelect.appendChild(option)
+        })
+      }
+      
+      // If no names for region, add a placeholder option
+      if (selectedRegion && regionNames[selectedRegion].length === 0) {
+        const option = document.createElement('option')
+        option.value = "N/A"
+        option.textContent = "N/A"
+        nameSelect.appendChild(option)
+      }
+    }
+    
+    // Function to update status styling when "In Progress" is selected
+    function updateStatusStyle() {
+      const statusSelect = document.getElementById('status')
+      if (statusSelect.value === 'In Progress') {
+        statusSelect.classList.add('in-progress')
+      } else {
+        statusSelect.classList.remove('in-progress')
+      }
+    }
+    
+    // Set min date for date inputs to today
+    document.addEventListener('DOMContentLoaded', function() {
+      const today = new Date().toISOString().split('T')[0]
+      document.getElementById('startDate').setAttribute('min', today)
+      document.getElementById('endDate').setAttribute('min', today)
+      
+      // Set end date min to match start date when start date changes
+      document.getElementById('startDate').addEventListener('change', function() {
+        document.getElementById('endDate').setAttribute('min', this.value)
+        
+        // If end date is before start date, update it
+        const endDate = document.getElementById('endDate')
+        if (endDate.value && endDate.value < this.value) {
+          endDate.value = this.value
+        }
+      })
+    })
+
+    form.addEventListener('submit', e => {
+      e.preventDefault()
+      showLoadingIndicator()
+      
+      fetch(scriptURL, { method: 'POST', body: new FormData(form)})
+        .then(response => {
+          showSuccessMessage(response)
+          form.reset() // Reset form fields after successful submission
+          // Reset the name dropdown to default state
+          document.getElementById('name').innerHTML = '<option value="" disabled selected>Select a name</option>'
+          // Reset status styling
+          document.getElementById('status').classList.remove('in-progress')
+        })
+        .catch(error => showErrorMessage(error))
+    })
+
+    function showLoadingIndicator() {
+      form.classList.add('is-hidden')
+      loading.classList.remove('is-hidden')
+    }
+
+    function showSuccessMessage(response) {
+      console.log('Success!', response)
+      loading.classList.add('is-hidden')
+      successMessage.classList.remove('is-hidden')
+      
+      // Hide success message after 5 seconds and show form again
+      setTimeout(() => {
+        successMessage.classList.add('is-hidden')
+        form.classList.remove('is-hidden')
+      }, 5000)
+    }
+
+    function showErrorMessage(error) {
+      console.error('Error!', error.message)
+      loading.classList.add('is-hidden')
+      errorMessage.classList.remove('is-hidden')
+      
+      // Hide error message after 5 seconds and show form again
+      setTimeout(() => {
+        errorMessage.classList.add('is-hidden')
+        form.classList.remove('is-hidden')
+      }, 5000)
+    }
+  </script>
+</body>
+</html>
