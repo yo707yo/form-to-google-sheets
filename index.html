@@ -378,7 +378,7 @@
 
   <script>
     // Your Google Apps Script Web App URL from the deployment
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbwkD2HE0qFxrWWkgqvKGeEmtRzNSVO0JHXrZOka7JeJWxXSHxJ7pUrmlxwcn1IUxB_3Kw/exec'
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbxR_I7bUk9MQM5GPmvlPHXKav47tMxV_cTxxbD3vvFrgcsXyBU1dijtGlx4TMj4J8ec0g/exec'
     
     const form = document.forms['submit-to-google-sheet']
     const loading = document.querySelector('.js-loading')
@@ -436,16 +436,39 @@
       }
     }
     
-    // Set min date for date inputs to today
+    // Initialize date inputs without min date restrictions to allow any date selection
     document.addEventListener('DOMContentLoaded', function() {
-      const today = new Date().toISOString().split('T')[0]
-      document.getElementById('startDate').setAttribute('min', today)
-      document.getElementById('endDate').setAttribute('min', today)
+      // Set current date as default value for date inputs
+      const now = new Date()
+      const today = now.getFullYear() + '-' + 
+                   String(now.getMonth() + 1).padStart(2, '0') + '-' + 
+                   String(now.getDate()).padStart(2, '0')
       
-      // Set end date min to match start date when start date changes
-      document.getElementById('startDate').addEventListener('change', function() {
-        document.getElementById('endDate').setAttribute('min', this.value)
+      // Set today as the default value instead of min
+      document.getElementById('startDate').value = today
+      document.getElementById('endDate').value = today
+      
+      // Make date inputs more mobile-friendly
+      const dateInputs = document.querySelectorAll('input[type="date"]')
+      
+      dateInputs.forEach(input => {
+        // Add touch-friendly class
+        input.classList.add('mobile-date-input')
         
+        // For iOS and Android better experience
+        input.addEventListener('touchstart', function(e) {
+          // This helps trigger the native date picker on mobile
+          e.target.focus()
+        })
+        
+        // Ensure the input is always in focus when tapped
+        input.addEventListener('click', function(e) {
+          e.target.focus()
+        })
+      })
+      
+      // Set end date to match start date when start date changes
+      document.getElementById('startDate').addEventListener('change', function() {
         // If end date is before start date, update it
         const endDate = document.getElementById('endDate')
         if (endDate.value && endDate.value < this.value) {
