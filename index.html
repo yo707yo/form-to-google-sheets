@@ -9,15 +9,28 @@
   
   <style>
     :root {
-      --primary-color: #4285F4;
-      --secondary-color: #34A853;
-      --background-color: #f9f9f9;
+      --mint-green: #4eb396;
+      --pale-aqua: #b1e1e4;
+      --teal-green: #47b6a3;
+      --sky-blue: #3aa5d6;
+      
+      --primary-color: var(--sky-blue);
+      --secondary-color: var(--mint-green);
+      --background-color: #f0f4f8;
       --text-color: #333333;
       --error-color: #EA4335;
-      --success-color: #34A853;
-      --form-header-bg: #5c3d86;
+      --success-color: var(--mint-green);
+      --form-header-bg: var(--teal-green);
       --form-header-text: #ffffff;
-      --in-progress-color: #34A853;
+      --in-progress-color: var(--mint-green);
+      --glass-bg: rgba(255, 255, 255, 0.7);
+      --glass-border: rgba(255, 255, 255, 0.2);
+      --glass-shadow: rgba(0, 0, 0, 0.1);
+      
+      /* Name colors for dropdown */
+      --name-color-1: var(--mint-green);
+      --name-color-2: var(--sky-blue);
+      --name-color-3: var(--teal-green);
     }
 
     * {
@@ -27,11 +40,12 @@
     }
 
     body {
-      background: var(--background-color);
+      background: linear-gradient(135deg, var(--pale-aqua) 0%, #d9e2ec 100%);
       color: var(--text-color);
       padding: 40px 20px;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       line-height: 1.5;
+      min-height: 100vh;
     }
 
     .container {
@@ -42,49 +56,98 @@
     h1 {
       text-align: center;
       margin-bottom: 30px;
-      color: var(--primary-color);
+      color: var(--teal-green);
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
     }
 
+    /* Frosted glass effect for form container */
     .form-container {
       position: relative;
-      background: #fff;
+      background: linear-gradient(135deg, rgba(177, 225, 228, 0.4) 0%, rgba(255, 255, 255, 0.7) 100%);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
       padding: 30px;
-      border-radius: 8px;
-      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+      border-radius: 16px;
+      box-shadow: 
+        0 4px 30px rgba(0, 0, 0, 0.1),
+        inset 0 0 0 1px var(--glass-border);
       margin-bottom: 30px;
+      border: 1px solid var(--glass-border);
+      overflow: hidden;
     }
 
+    /* 3D effect for form header */
     .form-header {
-      background-color: var(--form-header-bg);
+      background: linear-gradient(135deg, var(--teal-green) 0%, var(--sky-blue) 100%);
       color: var(--form-header-text);
       padding: 15px;
       margin: -30px -30px 20px -30px;
-      border-radius: 8px 8px 0 0;
+      border-radius: 16px 16px 0 0;
       text-align: center;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      position: relative;
+      z-index: 1;
+    }
+
+    .form-header h2 {
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
     }
 
     .form-group {
       margin-bottom: 20px;
+      position: relative;
     }
 
     label {
       display: block;
       margin-bottom: 5px;
       font-weight: 500;
+      text-shadow: 0 1px 1px rgba(255, 255, 255, 0.8);
     }
 
-    input, textarea, select {
+    /* Frosted glass effect for inputs */
+    input, textarea {
       width: 100%;
       padding: 12px;
-      border: 1px solid #ddd;
-      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.8);
+      border: 1px solid var(--glass-border);
+      border-radius: 8px;
       font-size: 16px;
-      transition: border-color 0.3s;
+      transition: all 0.3s;
+      box-shadow: 
+        0 2px 5px rgba(0, 0, 0, 0.05),
+        inset 0 1px 0 rgba(255, 255, 255, 0.5);
+    }
+
+    /* Transparent select dropdowns */
+    select {
+      width: 100%;
+      padding: 12px;
+      background-color: rgba(255, 255, 255, 0.6);
+      border: 1px solid var(--glass-border);
+      border-radius: 8px;
+      font-size: 16px;
+      transition: all 0.3s;
+      box-shadow: 
+        0 2px 5px rgba(0, 0, 0, 0.05),
+        inset 0 1px 0 rgba(255, 255, 255, 0.5);
+      -webkit-appearance: none;
+      appearance: none;
+      background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2347b6a3%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px top 50%;
+      background-size: 12px auto;
+      padding-right: 30px;
     }
 
     input:focus, textarea:focus, select:focus {
       outline: none;
-      border-color: var(--primary-color);
+      border-color: var(--teal-green);
+      box-shadow: 
+        0 0 0 3px rgba(71, 182, 163, 0.2),
+        0 2px 5px rgba(0, 0, 0, 0.05),
+        inset 0 1px 0 rgba(255, 255, 255, 0.5);
+      background-color: rgba(255, 255, 255, 0.9);
     }
 
     textarea {
@@ -92,26 +155,47 @@
       resize: vertical;
     }
 
+    /* 3D button effect */
     button {
-      background-color: var(--primary-color);
+      background: linear-gradient(to bottom, var(--mint-green) 0%, var(--teal-green) 100%);
       color: white;
       border: none;
       padding: 12px 20px;
       font-size: 16px;
-      border-radius: 4px;
+      border-radius: 8px;
       cursor: pointer;
       width: 100%;
-      transition: background-color 0.3s;
+      transition: all 0.3s;
+      box-shadow: 
+        0 4px 6px rgba(0, 0, 0, 0.1),
+        0 1px 3px rgba(0, 0, 0, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+      text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+      position: relative;
+      top: 0;
     }
 
     button:hover {
-      background-color: #3367D6;
+      background: linear-gradient(to bottom, var(--teal-green) 0%, var(--mint-green) 100%);
+      box-shadow: 
+        0 6px 8px rgba(0, 0, 0, 0.15),
+        0 1px 3px rgba(0, 0, 0, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    }
+    
+    button:active {
+      top: 2px;
+      box-shadow: 
+        0 2px 4px rgba(0, 0, 0, 0.1),
+        0 1px 2px rgba(0, 0, 0, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
     }
 
     .is-hidden {
       display: none !important;
     }
 
+    /* Frosted glass loading overlay */
     .loading {
       position: absolute;
       top: 0;
@@ -122,46 +206,65 @@
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      background: rgba(255, 255, 255, 0.9);
-      border-radius: 8px;
+      background: linear-gradient(135deg, rgba(177, 225, 228, 0.6) 0%, rgba(255, 255, 255, 0.8) 100%);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border-radius: 16px;
+      z-index: 10;
     }
 
     .loading-spinner {
-      width: 50px;
-      height: 50px;
+      width: 60px;
+      height: 60px;
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 50%;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      padding: 10px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
 
     .loading-spinner svg {
       position: relative;
       animation: rotate 2s linear infinite;
-      height: 50px;
-      width: 50px;
+      height: 40px;
+      width: 40px;
     }
 
     .loading-spinner circle {
-      stroke: var(--primary-color);
+      stroke: var(--teal-green);
+      stroke-width: 3;
       stroke-dasharray: 1,200;
       stroke-dashoffset: 0;
       stroke-linecap: round;
       animation: dash 1.5s ease-in-out infinite;
+      filter: drop-shadow(0 0 1px rgba(71, 182, 163, 0.5));
     }
 
+    /* Frosted glass effect for messages */
     .message {
       padding: 15px;
-      border-radius: 4px;
+      border-radius: 12px;
       margin-top: 20px;
       text-align: center;
       font-weight: 500;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid var(--glass-border);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     }
 
     .success-message {
-      background-color: rgba(52, 168, 83, 0.1);
+      background: linear-gradient(135deg, rgba(78, 179, 150, 0.15) 0%, rgba(255, 255, 255, 0.7) 100%);
       color: var(--success-color);
+      border-left: 4px solid var(--success-color);
     }
 
     .error-message {
-      background-color: rgba(234, 67, 53, 0.1);
+      background: linear-gradient(135deg, rgba(234, 67, 53, 0.15) 0%, rgba(255, 255, 255, 0.7) 100%);
       color: var(--error-color);
+      border-left: 4px solid var(--error-color);
     }
 
     /* Style for "In Progress" option */
@@ -175,11 +278,41 @@
       color: var(--in-progress-color);
       font-style: italic;
     }
+    
+    /* Name color classes for dropdown options */
+    .name-color-1 {
+      color: var(--name-color-1);
+      font-weight: 500;
+    }
+    
+    .name-color-2 {
+      color: var(--name-color-2);
+      font-weight: 500;
+    }
+    
+    .name-color-3 {
+      color: var(--name-color-3);
+      font-weight: 500;
+    }
 
     /* Date input styling */
     input[type="date"] {
       appearance: none;
+      -webkit-appearance: none;
       padding-right: 30px; /* Space for calendar icon */
+      position: relative;
+      z-index: 1;
+    }
+    
+    /* Prevent calendar popup from flickering */
+    input[type="date"]::-webkit-calendar-picker-indicator {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      opacity: 0.8;
+      cursor: pointer;
+      z-index: 2;
     }
 
     /* Responsive styles for better mobile experience */
@@ -225,20 +358,34 @@
       100% { stroke-dasharray: 89,200; stroke-dashoffset: -124; }
     }
 
+    /* Frosted glass footer */
     .footer {
       text-align: center;
       margin-top: 20px;
-      color: #666;
+      padding: 15px;
+      color: #555;
       font-size: 14px;
+      background: linear-gradient(135deg, rgba(177, 225, 228, 0.4) 0%, rgba(255, 255, 255, 0.7) 100%);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-radius: 12px;
+      box-shadow: 
+        0 4px 15px rgba(0, 0, 0, 0.05),
+        inset 0 0 0 1px var(--glass-border);
+      border: 1px solid var(--glass-border);
     }
 
     .footer a {
-      color: var(--primary-color);
+      color: var(--teal-green);
       text-decoration: none;
+      font-weight: 500;
+      transition: all 0.3s;
     }
 
     .footer a:hover {
-      text-decoration: underline;
+      color: var(--mint-green);
+      text-decoration: none;
+      text-shadow: 0 0 1px rgba(78, 179, 150, 0.3);
     }
 
     /* Date range container for better mobile layout */
@@ -273,7 +420,9 @@
         <h2>Daily Report Submission</h2>
       </div>
       
-      <form name="submit-to-google-sheet">
+      <!-- Form target is set to a hidden iframe to prevent page navigation -->
+      <iframe name="hidden-iframe" style="display:none;"></iframe>
+      <form name="submit-to-google-sheet" action="https://script.google.com/macros/s/AKfycbx8YI42p-0fWE1DKMcSir_SyRNGMRxoV8CrNp3AcGb2BeHxFDre_gap4ANgW-JcCsIRxg/exec" method="post" enctype="application/x-www-form-urlencoded" target="hidden-iframe" onsubmit="return handleFormSubmit(event)">
         <div class="form-group">
           <label for="region">Your local Co-op?</label>
           <select id="region" name="Your local Co-op?" required onchange="updateNameOptions()">
@@ -316,8 +465,8 @@
         </div>
         
         <div class="form-group">
-          <label for="tasks">Tasks/Actions Completed</label>
-          <textarea id="tasks" name="Tasks/Actions Completed" placeholder="Describe tasks or actions completed..." required></textarea>
+          <label for="tasks">Tasks/Actions</label>
+          <textarea id="tasks" name="Tasks/Actions" placeholder="Describe tasks or actions..." required></textarea>
         </div>
         
         <div class="form-group">
@@ -353,6 +502,9 @@
           </div>
         </div>
         
+        <!-- Hidden timestamp field -->
+        <input type="hidden" id="timestamp" name="Timestamp" value="">
+        
         <button type="submit">Submit Report</button>
       </form>
 
@@ -377,8 +529,8 @@
   </div>
 
   <script>
-    // Your Google Apps Script Web App URL from the deployment
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbw4-Eq_DEgKWh4GuhgV_8F4eEGdMzUUQe_H_7fHISCr9W1O2HBPBAB9r5erk66AxDGwDw/exec'
+    // Your Google Apps Script Web App URL from the deployment - must match the form action URL
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbx8YI42p-0fWE1DKMcSir_SyRNGMRxoV8CrNp3AcGb2BeHxFDre_gap4ANgW-JcCsIRxg/exec'
     
     const form = document.forms['submit-to-google-sheet']
     const loading = document.querySelector('.js-loading')
@@ -399,6 +551,20 @@
       'Palm Springs': ['Kerwin Q', 'Greg K', 'Judy P']
     }
     
+    // Function to get a consistent color class for a name
+    function getNameColorClass(name) {
+      // Simple hash function to get a consistent number for each name
+      let hash = 0;
+      for (let i = 0; i < name.length; i++) {
+        hash = ((hash << 5) - hash) + name.charCodeAt(i);
+        hash = hash & hash; // Convert to 32bit integer
+      }
+      
+      // Use the hash to get a consistent color (1, 2, or 3)
+      const colorIndex = Math.abs(hash % 3) + 1;
+      return `name-color-${colorIndex}`;
+    }
+    
     // Function to update name options based on selected region
     function updateNameOptions() {
       const regionSelect = document.getElementById('region')
@@ -414,6 +580,10 @@
           const option = document.createElement('option')
           option.value = name
           option.textContent = name
+          
+          // Assign a consistent color class to this name
+          option.className = getNameColorClass(name)
+          
           nameSelect.appendChild(option)
         })
       }
@@ -441,6 +611,7 @@
     document.addEventListener('DOMContentLoaded', function() {
       // Set current date as default value for date inputs
       const now = new Date()
+      // Format for input[type="date"] needs to be yyyy-mm-dd
       const today = now.getFullYear() + '-' + 
                    String(now.getMonth() + 1).padStart(2, '0') + '-' + 
                    String(now.getDate()).padStart(2, '0')
@@ -449,22 +620,33 @@
       document.getElementById('startDate').value = today
       document.getElementById('endDate').value = today
       
-      // Make date inputs more mobile-friendly
+      // Make date inputs more stable and prevent flickering
       const dateInputs = document.querySelectorAll('input[type="date"]')
       
       dateInputs.forEach(input => {
-        // Add touch-friendly class
-        input.classList.add('mobile-date-input')
+        // Add stable date input class
+        input.classList.add('stable-date-input')
         
-        // For iOS and Android better experience
-        input.addEventListener('touchstart', function(e) {
-          // This helps trigger the native date picker on mobile
-          e.target.focus()
+        // Use a more stable approach for date inputs
+        // Instead of trying to manipulate the native date picker,
+        // we'll just let the browser handle it naturally
+        
+        // Prevent any potential flickering by ensuring the input stays in place
+        input.addEventListener('mousedown', function(e) {
+          // Ensure the input doesn't move when clicked
+          e.stopPropagation()
         })
         
-        // Ensure the input is always in focus when tapped
-        input.addEventListener('click', function(e) {
-          e.target.focus()
+        // For mobile devices, prevent touch events from causing flickering
+        input.addEventListener('touchstart', function(e) {
+          // Ensure the input doesn't move when touched
+          e.stopPropagation()
+        })
+        
+        // Make the calendar retract after selecting a date
+        input.addEventListener('change', function() {
+          // Blur the input to close the calendar
+          this.blur()
         })
       })
       
@@ -478,54 +660,89 @@
       })
     })
 
-    form.addEventListener('submit', e => {
-      e.preventDefault()
+    // Function to format date and time in Pacific Time Zone
+    function formatPacificDateTime(date) {
+      // Get current time in Pacific Standard Time
+      const options = {
+        timeZone: 'America/Los_Angeles',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true,
+      };
+
+      const dateOptions = {
+        timeZone: 'America/Los_Angeles',
+        month: '2-digit',
+        day: '2-digit',
+        year: 'numeric',
+      };
+
+      const pacificTime = date.toLocaleTimeString('en-US', options); // hr:mm AM/PM
+      const pacificDate = date.toLocaleDateString('en-US', dateOptions); // mm/dd/yyyy
+      
+      return `${pacificDate} ${pacificTime}`;
+    }
+    
+    // Function to convert yyyy-mm-dd to mm/dd/yyyy format
+    function convertDateFormat(dateStr) {
+      if (!dateStr) return '';
+      const [year, month, day] = dateStr.split('-');
+      return `${month}/${day}/${year}`;
+    }
+    
+    // Handle form submission using iframe technique (avoids CORS issues)
+    function handleFormSubmit(event) {
       showLoadingIndicator()
       
-      // Create a new FormData object from the form
-      const formData = new FormData(form)
+      // Set the timestamp with current date and time in Pacific Time Zone
+      const now = new Date();
+      document.getElementById('timestamp').value = formatPacificDateTime(now);
       
-      // Convert FormData to URL-encoded string for JSONP request
-      const params = new URLSearchParams(formData).toString()
+      // Format the date inputs in mm/dd/yyyy format for submission
+      const startDateInput = document.getElementById('startDate');
+      const endDateInput = document.getElementById('endDate');
       
-      // Create a script element for JSONP request (bypasses CORS)
-      const script = document.createElement('script')
+      // Store the original values
+      const startDateValue = startDateInput.value;
+      const endDateValue = endDateInput.value;
       
-      // Generate a unique callback function name
-      const callbackName = 'jsonpCallback_' + Date.now()
+      // Convert the date format for display in Google Sheets
+      if (startDateValue) {
+        startDateInput.value = convertDateFormat(startDateValue);
+      }
       
-      // Define the callback function
-      window[callbackName] = function(data) {
-        // Clean up - remove the script tag and delete the callback function
-        document.body.removeChild(script)
-        delete window[callbackName]
+      if (endDateValue) {
+        endDateInput.value = convertDateFormat(endDateValue);
+      }
+      
+      // Set the form's action to the script URL
+      form.action = scriptURL
+      
+      // After form submission, show success message
+      setTimeout(() => {
+        showSuccessMessage({ ok: true })
         
-        // Handle the response
-        if (data.result === 'success') {
-          showSuccessMessage({ ok: true })
-          form.reset() // Reset form fields after successful submission
+        // Reset form after showing success message
+        setTimeout(() => {
+          form.reset()
           // Reset the name dropdown to default state
           document.getElementById('name').innerHTML = '<option value="" disabled selected>Select a name</option>'
           // Reset status styling
           document.getElementById('status').classList.remove('in-progress')
-        } else {
-          showErrorMessage({ message: 'Submission failed' })
-        }
-      }
+          
+          // Set today's date again
+          const now = new Date()
+          const today = now.getFullYear() + '-' + 
+                       String(now.getMonth() + 1).padStart(2, '0') + '-' + 
+                       String(now.getDate()).padStart(2, '0')
+          document.getElementById('startDate').value = today
+          document.getElementById('endDate').value = today
+        }, 5000)
+      }, 1500)
       
-      // Set up the script URL with callback parameter
-      script.src = scriptURL + '?callback=' + callbackName + '&' + params
-      
-      // Handle errors
-      script.onerror = function() {
-        document.body.removeChild(script)
-        delete window[callbackName]
-        showErrorMessage({ message: 'Network error occurred' })
-      }
-      
-      // Add the script to the document to start the request
-      document.body.appendChild(script)
-    })
+      // Return true to allow the form to submit
+      return true
+    }
 
     function showLoadingIndicator() {
       form.classList.add('is-hidden')
