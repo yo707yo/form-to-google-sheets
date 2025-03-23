@@ -378,10 +378,11 @@
 
   <script>
     // Your Google Apps Script Web App URL from the deployment
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbw6boUuDIV03S-X2VPVNrwmAu7VsDtLqBJ7RCtYCO5mce1BUejHNIcSKCWHFFe-H-zZig/exec'
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbw4-Eq_DEgKWh4GuhgV_8F4eEGdMzUUQe_H_7fHISCr9W1O2HBPBAB9r5erk66AxDGwDw/exec'
     
     const form = document.forms['submit-to-google-sheet']
     const loading = document.querySelector('.js-loading')
+    
     const successMessage = document.querySelector('.js-success-message')
     const errorMessage = document.querySelector('.js-error-message')
     
@@ -481,16 +482,49 @@
       e.preventDefault()
       showLoadingIndicator()
       
-      fetch(scriptURL, { method: 'POST', body: new FormData(form)})
-        .then(response => {
-          showSuccessMessage(response)
+      // Create a new FormData object from the form
+      const formData = new FormData(form)
+      
+      // Convert FormData to URL-encoded string for JSONP request
+      const params = new URLSearchParams(formData).toString()
+      
+      // Create a script element for JSONP request (bypasses CORS)
+      const script = document.createElement('script')
+      
+      // Generate a unique callback function name
+      const callbackName = 'jsonpCallback_' + Date.now()
+      
+      // Define the callback function
+      window[callbackName] = function(data) {
+        // Clean up - remove the script tag and delete the callback function
+        document.body.removeChild(script)
+        delete window[callbackName]
+        
+        // Handle the response
+        if (data.result === 'success') {
+          showSuccessMessage({ ok: true })
           form.reset() // Reset form fields after successful submission
           // Reset the name dropdown to default state
           document.getElementById('name').innerHTML = '<option value="" disabled selected>Select a name</option>'
           // Reset status styling
           document.getElementById('status').classList.remove('in-progress')
-        })
-        .catch(error => showErrorMessage(error))
+        } else {
+          showErrorMessage({ message: 'Submission failed' })
+        }
+      }
+      
+      // Set up the script URL with callback parameter
+      script.src = scriptURL + '?callback=' + callbackName + '&' + params
+      
+      // Handle errors
+      script.onerror = function() {
+        document.body.removeChild(script)
+        delete window[callbackName]
+        showErrorMessage({ message: 'Network error occurred' })
+      }
+      
+      // Add the script to the document to start the request
+      document.body.appendChild(script)
     })
 
     function showLoadingIndicator() {
