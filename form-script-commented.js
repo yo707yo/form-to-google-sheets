@@ -1,5 +1,5 @@
-// The default sheet name is 'Sheet1'. To target a different sheet, update this variable.
-var sheetName = 'Sheet1'
+// The sheet name is 'Founders'. To target a different sheet, update this variable.
+var sheetName = 'Founders'
 
 /*
 Gets a property store that all users can access, but only within this script.
@@ -14,6 +14,20 @@ https://developers.google.com/apps-script/reference/spreadsheet/spreadsheet-app#
 function setup () {
   var doc = SpreadsheetApp.getActiveSpreadsheet()
   scriptProp.setProperty('key', doc.getId())
+}
+
+/*
+Handle GET requests for CORS preflight. This is necessary for browsers to check if the server
+allows cross-origin requests before making the actual POST request.
+https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS#preflighted_requests
+*/
+function doGet(e) {
+  return ContentService
+    .createTextOutput(JSON.stringify({ 'result': 'success', 'message': 'CORS enabled' }))
+    .setMimeType(ContentService.MimeType.JSON)
+    .addHeader('Access-Control-Allow-Origin', '*') // Allow requests from any origin
+    .addHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS') // Allow these HTTP methods
+    .addHeader('Access-Control-Allow-Headers', 'Content-Type'); // Allow Content-Type header
 }
 
 function doPost (e) {
@@ -57,9 +71,10 @@ function doPost (e) {
     Then returns the rectangular grid of values for this range (a two-dimensional array of values, indexed by row, then by column.)
     https://developers.google.com/apps-script/reference/spreadsheet/range#getValues()
     */
-    var headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0]
-    // Gets the last row and then adds one
-    var nextRow = sheet.getLastRow() + 1
+    var headers = sheet.getRange(3, 1, 1, sheet.getLastColumn()).getValues()[0]
+    // Gets the last row and then adds one, ensuring we start at row 4 (after headers in row 3)
+    var lastRow = sheet.getLastRow();
+    var nextRow = lastRow < 3 ? 4 : lastRow + 1;
 
     /*
     Maps the headers array to a new array. If a header's value is 'timestamp' then it
@@ -78,22 +93,28 @@ function doPost (e) {
     sheet.getRange(nextRow, 1, 1, newRow.length).setValues([newRow])
 
     /*
-    Return success results as JSON
+    Return success results as JSON with CORS headers to allow cross-origin requests
     https://developers.google.com/apps-script/reference/content/content-service
     */
     return ContentService
       .createTextOutput(JSON.stringify({ 'result': 'success', 'row': nextRow }))
       .setMimeType(ContentService.MimeType.JSON)
+      .addHeader('Access-Control-Allow-Origin', '*')
+      .addHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
+      .addHeader('Access-Control-Allow-Headers', 'Content-Type');
   }
 
   /*
-  Return error results as JSON
+  Return error results as JSON with CORS headers
   https://developers.google.com/apps-script/reference/content/content-service
   */
   catch (e) {
     return ContentService
-      .createTextOutput(JSON.stringify({ 'result': 'error', 'error': e }))
+      .createTextOutput(JSON.stringify({ 'result': 'error', 'error': e.toString() }))
       .setMimeType(ContentService.MimeType.JSON)
+      .addHeader('Access-Control-Allow-Origin', '*')
+      .addHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
+      .addHeader('Access-Control-Allow-Headers', 'Content-Type');
   }
 
   finally {
