@@ -422,7 +422,7 @@
       
       <!-- Form target is set to a hidden iframe to prevent page navigation -->
       <iframe name="hidden-iframe" style="display:none;"></iframe>
-      <form name="submit-to-google-sheet" action="https://script.google.com/macros/s/AKfycbw8cFGlpqYCoY4c5EX3pHO_Bq1MGt6bclOIZ4w7G76zZdrBe_xJ9o2LMV32cPPGUSM27g/exec" method="post" enctype="application/x-www-form-urlencoded" target="hidden-iframe" onsubmit="return handleFormSubmit(event)">
+      <form name="submit-to-google-sheet" action="https://script.google.com/macros/s/AKfycbw8cFGlpqYCoY4c5EX3pHO_Bq1MGt6bclOIZ4w7G76zZdrBe_xJ9o2LMV32cPPGUSM27g/exec" method="post" target="hidden-iframe" onsubmit="return prepareFormData()">
         <div class="form-group">
           <label for="region">Your local Co-op?</label>
           <select id="region" name="Your local Co-op?" required onchange="updateNameOptions()">
@@ -503,7 +503,7 @@
         </div>
         
         <!-- Hidden timestamp field -->
-        <input type="hidden" id="timestamp" name="Timestamp" value="">
+        <input type="hidden" id="timestamp" name="Logged Date/Time" value="">
         
         <button type="submit">Submit Report</button>
       </form>
@@ -690,68 +690,73 @@
       return `${month}/${day}/${year}`;
     }
     
-    // Handle form submission using iframe technique (avoids CORS issues)
-    function handleFormSubmit(event) {
-      showLoadingIndicator()
+    // Function to prepare form data before submission
+    function prepareFormData() {
+      // Show loading indicator
+      showLoadingIndicator();
       
-      // Set the timestamp with current date and time in Pacific Time Zone
-      const now = new Date();
-      document.getElementById('timestamp').value = formatPacificDateTime(now);
-      
-      // Get the date input values
-      const startDateInput = document.getElementById('startDate');
-      const endDateInput = document.getElementById('endDate');
-      
-      // Store the original values
-      const startDateValue = startDateInput.value;
-      const endDateValue = endDateInput.value;
-      
-      // Create hidden inputs for the formatted dates
-      // For Start Date
-      const startDateFormatted = document.createElement('input');
-      startDateFormatted.type = 'hidden';
-      startDateFormatted.name = 'Start Date';
-      startDateFormatted.value = convertDateFormat(startDateValue);
-      form.appendChild(startDateFormatted);
-      
-      // For End Date
-      const endDateFormatted = document.createElement('input');
-      endDateFormatted.type = 'hidden';
-      endDateFormatted.name = 'End Date';
-      endDateFormatted.value = convertDateFormat(endDateValue);
-      form.appendChild(endDateFormatted);
-      
-      // Rename the original date inputs so they don't get submitted with the same name
-      startDateInput.name = 'Start Date Original';
-      endDateInput.name = 'End Date Original';
-      
-      // Set the form's action to the script URL
-      form.action = scriptURL
-      
-      // After form submission, show success message
-      setTimeout(() => {
-        showSuccessMessage({ ok: true })
+      try {
+        // Set the timestamp with current date and time in Pacific Time Zone
+        const now = new Date();
+        document.getElementById('timestamp').value = formatPacificDateTime(now);
         
-        // Reset form after showing success message
-        setTimeout(() => {
-          form.reset()
-          // Reset the name dropdown to default state
-          document.getElementById('name').innerHTML = '<option value="" disabled selected>Select a name</option>'
-          // Reset status styling
-          document.getElementById('status').classList.remove('in-progress')
+        // Get the date input values
+        const startDateInput = document.getElementById('startDate');
+        const endDateInput = document.getElementById('endDate');
+        
+        // Format the dates in mm/dd/yyyy format
+        if (startDateInput && startDateInput.value) {
+          // Create a hidden input for the formatted start date
+          const formattedStartDate = document.createElement('input');
+          formattedStartDate.type = 'hidden';
+          formattedStartDate.name = 'Start Date';
+          formattedStartDate.value = convertDateFormat(startDateInput.value);
+          form.appendChild(formattedStartDate);
           
-          // Set today's date again
-          const now = new Date()
-          const today = now.getFullYear() + '-' + 
-                       String(now.getMonth() + 1).padStart(2, '0') + '-' + 
-                       String(now.getDate()).padStart(2, '0')
-          document.getElementById('startDate').value = today
-          document.getElementById('endDate').value = today
-        }, 5000)
-      }, 1500)
-      
-      // Return true to allow the form to submit
-      return true
+          // Rename the original input to avoid conflicts
+          startDateInput.name = '_startDate_original';
+        }
+        
+        if (endDateInput && endDateInput.value) {
+          // Create a hidden input for the formatted end date
+          const formattedEndDate = document.createElement('input');
+          formattedEndDate.type = 'hidden';
+          formattedEndDate.name = 'End Date';
+          formattedEndDate.value = convertDateFormat(endDateInput.value);
+          form.appendChild(formattedEndDate);
+          
+          // Rename the original input to avoid conflicts
+          endDateInput.name = '_endDate_original';
+        }
+        
+        // After form submission, show success message
+        setTimeout(() => {
+          showSuccessMessage({ ok: true });
+          
+          // Reset form after showing success message
+          setTimeout(() => {
+            form.reset();
+            // Reset the name dropdown to default state
+            document.getElementById('name').innerHTML = '<option value="" disabled selected>Select a name</option>';
+            // Reset status styling
+            document.getElementById('status').classList.remove('in-progress');
+            
+            // Set today's date again
+            const now = new Date();
+            const today = now.getFullYear() + '-' + 
+                         String(now.getMonth() + 1).padStart(2, '0') + '-' + 
+                         String(now.getDate()).padStart(2, '0');
+            document.getElementById('startDate').value = today;
+            document.getElementById('endDate').value = today;
+          }, 5000);
+        }, 1500);
+        
+        return true;
+      } catch (error) {
+        console.error('Error preparing form data:', error);
+        showErrorMessage(error);
+        return false;
+      }
     }
 
     function showLoadingIndicator() {
