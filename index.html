@@ -422,7 +422,7 @@
       
       <!-- Form target is set to a hidden iframe to prevent page navigation -->
       <iframe name="hidden-iframe" style="display:none;"></iframe>
-      <form name="submit-to-google-sheet" action="https://script.google.com/macros/s/AKfycbx8YI42p-0fWE1DKMcSir_SyRNGMRxoV8CrNp3AcGb2BeHxFDre_gap4ANgW-JcCsIRxg/exec" method="post" enctype="application/x-www-form-urlencoded" target="hidden-iframe" onsubmit="return handleFormSubmit(event)">
+      <form name="submit-to-google-sheet" action="https://script.google.com/macros/s/AKfycbw8cFGlpqYCoY4c5EX3pHO_Bq1MGt6bclOIZ4w7G76zZdrBe_xJ9o2LMV32cPPGUSM27g/exec" method="post" enctype="application/x-www-form-urlencoded" target="hidden-iframe" onsubmit="return handleFormSubmit(event)">
         <div class="form-group">
           <label for="region">Your local Co-op?</label>
           <select id="region" name="Your local Co-op?" required onchange="updateNameOptions()">
@@ -530,7 +530,7 @@
 
   <script>
     // Your Google Apps Script Web App URL from the deployment - must match the form action URL
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbx8YI42p-0fWE1DKMcSir_SyRNGMRxoV8CrNp3AcGb2BeHxFDre_gap4ANgW-JcCsIRxg/exec'
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbw8cFGlpqYCoY4c5EX3pHO_Bq1MGt6bclOIZ4w7G76zZdrBe_xJ9o2LMV32cPPGUSM27g/exec'
     
     const form = document.forms['submit-to-google-sheet']
     const loading = document.querySelector('.js-loading')
@@ -662,25 +662,25 @@
 
     // Function to format date and time in Pacific Time Zone
     function formatPacificDateTime(date) {
-      // Get current time in Pacific Standard Time
-      const options = {
-        timeZone: 'America/Los_Angeles',
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: true,
-      };
-
-      const dateOptions = {
-        timeZone: 'America/Los_Angeles',
-        month: '2-digit',
-        day: '2-digit',
-        year: 'numeric',
-      };
-
-      const pacificTime = date.toLocaleTimeString('en-US', options); // hr:mm AM/PM
-      const pacificDate = date.toLocaleDateString('en-US', dateOptions); // mm/dd/yyyy
+      // Convert to Pacific Time Zone
+      const pacificDate = new Date(date.toLocaleString('en-US', {timeZone: 'America/Los_Angeles'}));
       
-      return `${pacificDate} ${pacificTime}`;
+      // Extract components
+      const month = String(pacificDate.getMonth() + 1).padStart(2, '0');
+      const day = String(pacificDate.getDate()).padStart(2, '0');
+      const year = pacificDate.getFullYear();
+      
+      // Get hours in 12-hour format
+      let hours = pacificDate.getHours();
+      const ampm = hours >= 12 ? 'PM' : 'AM';
+      hours = hours % 12;
+      hours = hours ? hours : 12; // the hour '0' should be '12'
+      const formattedHours = String(hours).padStart(2, '0');
+      
+      const minutes = String(pacificDate.getMinutes()).padStart(2, '0');
+      
+      // Format as mm/dd/yyyy hh:mm AM/PM
+      return `${month}/${day}/${year} ${formattedHours}:${minutes} ${ampm}`;
     }
     
     // Function to convert yyyy-mm-dd to mm/dd/yyyy format
@@ -698,7 +698,7 @@
       const now = new Date();
       document.getElementById('timestamp').value = formatPacificDateTime(now);
       
-      // Format the date inputs in mm/dd/yyyy format for submission
+      // Get the date input values
       const startDateInput = document.getElementById('startDate');
       const endDateInput = document.getElementById('endDate');
       
@@ -706,14 +706,24 @@
       const startDateValue = startDateInput.value;
       const endDateValue = endDateInput.value;
       
-      // Convert the date format for display in Google Sheets
-      if (startDateValue) {
-        startDateInput.value = convertDateFormat(startDateValue);
-      }
+      // Create hidden inputs for the formatted dates
+      // For Start Date
+      const startDateFormatted = document.createElement('input');
+      startDateFormatted.type = 'hidden';
+      startDateFormatted.name = 'Start Date';
+      startDateFormatted.value = convertDateFormat(startDateValue);
+      form.appendChild(startDateFormatted);
       
-      if (endDateValue) {
-        endDateInput.value = convertDateFormat(endDateValue);
-      }
+      // For End Date
+      const endDateFormatted = document.createElement('input');
+      endDateFormatted.type = 'hidden';
+      endDateFormatted.name = 'End Date';
+      endDateFormatted.value = convertDateFormat(endDateValue);
+      form.appendChild(endDateFormatted);
+      
+      // Rename the original date inputs so they don't get submitted with the same name
+      startDateInput.name = 'Start Date Original';
+      endDateInput.name = 'End Date Original';
       
       // Set the form's action to the script URL
       form.action = scriptURL
